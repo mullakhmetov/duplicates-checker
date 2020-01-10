@@ -17,6 +17,8 @@ import (
 type server struct {
 	*Command
 	srv *http.Server
+
+	terminated chan struct{}
 }
 
 // Command starts http server
@@ -61,8 +63,9 @@ func (c *Command) newServer() *server {
 	}
 
 	return &server{
-		Command: c,
-		srv:     srv,
+		Command:    c,
+		srv:        srv,
+		terminated: make(chan struct{}),
 	}
 }
 
@@ -78,5 +81,10 @@ func (s *server) run(ctx context.Context) error {
 		return err
 	}
 
+	close(s.terminated)
 	return nil
+}
+
+func (s *server) Wait() {
+	<-s.terminated
 }
