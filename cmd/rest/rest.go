@@ -10,6 +10,7 @@ import (
 	"syscall"
 
 	"github.com/gin-gonic/gin"
+	"github.com/mullakhmetov/duplicates-checker/cmd"
 	"github.com/mullakhmetov/duplicates-checker/internal/healthcheck"
 )
 
@@ -21,6 +22,7 @@ type server struct {
 // Command starts http server
 type Command struct {
 	Port int `long:"port" env:"CHECKER_PORT" default:"8080" description:"port"`
+	cmd.CommonOpts
 }
 
 // Execute command starts Rest server
@@ -51,7 +53,7 @@ func (c *Command) Execute(args []string) error {
 func (c *Command) newServer() *server {
 	router := gin.Default()
 
-	healthcheck.RegisterHandlers(router)
+	healthcheck.RegisterHandlers(router, c.CommonOpts.Revision)
 
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%d", c.Port),

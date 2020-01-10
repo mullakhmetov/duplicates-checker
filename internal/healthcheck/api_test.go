@@ -17,11 +17,11 @@ func TestHealthcheck(t *testing.T) {
 	router.ServeHTTP(w, req)
 
 	assert.Equal(t, 200, w.Code)
-	assert.Equal(t, "pong", w.Body.String())
+	assert.Equal(t, "pong 1.0.0", w.Body.String())
 }
 
 func setupRouter() *gin.Engine {
 	r := gin.Default()
-	RegisterHandlers(r)
+	RegisterHandlers(r, "1.0.0")
 	return r
 }
