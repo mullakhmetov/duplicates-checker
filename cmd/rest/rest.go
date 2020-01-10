@@ -8,9 +8,9 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/mullakhmetov/duplicates-checker/internal/healthcheck"
 )
 
 type server struct {
@@ -50,10 +50,8 @@ func (c *Command) Execute(args []string) error {
 
 func (c *Command) newServer() *server {
 	router := gin.Default()
-	router.GET("/", func(c *gin.Context) {
-		time.Sleep(5 * time.Second)
-		c.String(http.StatusOK, "Welcome Gin Server")
-	})
+
+	healthcheck.RegisterHandlers(router)
 
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%d", c.Port),
