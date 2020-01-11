@@ -12,7 +12,7 @@ type testCase struct {
 }
 
 func TestRecordSuccEncode(t *testing.T) {
-	s := IpSerializer{}
+	s := IPSerializer{}
 
 	succCases := getSuccCases()
 
@@ -25,7 +25,7 @@ func TestRecordSuccEncode(t *testing.T) {
 }
 
 func TestRecordErrEncode(t *testing.T) {
-	s := IpSerializer{}
+	s := IPSerializer{}
 
 	errCases := []string{"", "-1.1.1.1", "1.1.1.1.1.1", "1.1.1", "0.0.0.256", "asdf"}
 
@@ -37,7 +37,7 @@ func TestRecordErrEncode(t *testing.T) {
 }
 
 func TestRecordSuccDecode(t *testing.T) {
-	s := IpSerializer{}
+	s := IPSerializer{}
 
 	succCases := getSuccCases()
 
