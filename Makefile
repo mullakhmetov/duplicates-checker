@@ -8,3 +8,6 @@ build:
 
 test:
 	go test -race ./... -count=1
+
+lint:
+	golint -set_exit_status ./...
