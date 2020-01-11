@@ -14,14 +14,16 @@ import (
 	"time"
 
 	"github.com/jessevdk/go-flags"
+	"github.com/mullakhmetov/duplicates-checker/cmd"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestRest(t *testing.T) {
 	port := chooseRandomUnusedPort()
-	c := Command{Port: port}
-	server := c.newServer()
+	c := newCommand(port)
+	server, err := c.newServer()
+	assert.NoError(t, err)
 	ctx, cancel := context.WithCancel(context.Background())
 	go func() {
 		server.run(ctx)
@@ -43,17 +45,19 @@ func TestRest(t *testing.T) {
 
 func TestRest_Shutdown(t *testing.T) {
 	port := chooseRandomUnusedPort()
-	c := Command{Port: port}
-	server := c.newServer()
+	c := newCommand(port)
+	server, err := c.newServer()
+	assert.NoError(t, err)
 	ctx, cancel := context.WithCancel(context.Background())
 	time.AfterFunc(100*time.Millisecond, func() {
 		cancel()
 	})
 
-	err := server.run(ctx)
+	err = server.run(ctx)
 	assert.NoError(t, err)
 	server.Wait()
 }
+
 func TestRest_Signal(t *testing.T) {
 	done := make(chan struct{})
 	go func() {
@@ -63,10 +67,10 @@ func TestRest_Signal(t *testing.T) {
 		require.NoError(t, err)
 	}()
 
-	c := Command{}
-
-	p := flags.NewParser(&c, flags.Default)
 	port := chooseRandomUnusedPort()
+	c := newCommand(port)
+
+	p := flags.NewParser(c, flags.Default)
 	args := []string{"--port=" + strconv.Itoa(port)}
 	_, err := p.ParseArgs(args)
 	require.NoError(t, err)
@@ -96,4 +100,8 @@ func waitForHTTPServerStart(port int) {
 			return
 		}
 	}
+}
+
+func newCommand(port int) *Command {
+	return &Command{Port: port, CommonOpts: cmd.CommonOpts{BoltDBName: "test.db"}}
 }

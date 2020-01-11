@@ -28,3 +28,9 @@ func (m *MockedService) Clear(ctx context.Context) error {
 	args := m.Called(ctx)
 	return args.Error(1)
 }
+
+// Close mocked
+func (m *MockedService) Close() error {
+	args := m.Called()
+	return args.Error(1)
+}

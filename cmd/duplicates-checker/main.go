@@ -17,6 +17,8 @@ var revision = "unknown"
 type opts struct {
 	Rest     rest.Command     `command:"server"`
 	Importer importer.Command `command:"import"`
+
+	BoltDBName string `long:"boltdbname" env:"CHECKER_BOLT_DB_NAME" default:"my.db" description:"boltdb db name"`
 }
 
 func main() {
@@ -28,7 +30,8 @@ func main() {
 	p.CommandHandler = func(command flags.Commander, args []string) error {
 		c := command.(cmd.Interface)
 		c.SetCommon(cmd.CommonOpts{
-			Revision: revision,
+			Revision:   revision,
+			BoltDBName: opts.BoltDBName,
 		})
 		err := c.Execute(args)
 		if err != nil {

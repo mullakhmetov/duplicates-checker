@@ -15,7 +15,7 @@ func TestSuccIsDoubleTrue(t *testing.T) {
 
 	ms.On("IsDouble", mock.AnythingOfType("*gin.Context"), UserID(1), UserID(1)).Return(true, nil)
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", "/1/1", nil)
+	req, _ := http.NewRequest("GET", "/duples/1/1", nil)
 	router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
 	ms.AssertExpectations(t)
@@ -26,7 +26,7 @@ func TestSuccIsDoubleFalse(t *testing.T) {
 
 	ms.On("IsDouble", mock.AnythingOfType("*gin.Context"), UserID(1), UserID(2)).Return(false, nil)
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", "/1/2", nil)
+	req, _ := http.NewRequest("GET", "/duples/1/2", nil)
 	router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
 	ms.AssertExpectations(t)
@@ -36,12 +36,12 @@ func TestFailIsDouble(t *testing.T) {
 	router, _ := setupRouter()
 
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", "/1/asdf", nil)
+	req, _ := http.NewRequest("GET", "/duples/1/asdf", nil)
 	router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
 
 	w = httptest.NewRecorder()
-	req, _ = http.NewRequest("GET", "/asdf/1", nil)
+	req, _ = http.NewRequest("GET", "/duples/asdf/1", nil)
 	router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
 }

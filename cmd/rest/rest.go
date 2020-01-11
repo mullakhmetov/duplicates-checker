@@ -8,15 +8,35 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
+	"github.com/boltdb/bolt"
 	"github.com/gin-gonic/gin"
 	"github.com/mullakhmetov/duplicates-checker/cmd"
 	"github.com/mullakhmetov/duplicates-checker/internal/healthcheck"
+	"github.com/mullakhmetov/duplicates-checker/internal/record"
+	"github.com/mullakhmetov/duplicates-checker/internal/store"
 )
+
+type services struct {
+	recordService *record.Service
+}
+
+type sharedResources struct {
+	boltDB *bolt.DB
+}
+
+func (s *sharedResources) Close() {
+	log.Print("[INFO] closing BoltDB")
+	s.boltDB.Close()
+}
 
 type server struct {
 	*Command
 	srv *http.Server
+
+	*services
+	*sharedResources
 
 	terminated chan struct{}
 }
@@ -41,8 +61,11 @@ func (c *Command) Execute(args []string) error {
 		cancel()
 	}()
 
-	server := c.newServer()
-	err := server.run(ctx)
+	server, err := c.newServer()
+	if err != nil {
+		return err
+	}
+	err = server.run(ctx)
 	if err != nil {
 		log.Printf("[ERROR] terminated with error %+v", err)
 		return err
@@ -52,21 +75,36 @@ func (c *Command) Execute(args []string) error {
 	return nil
 }
 
-func (c *Command) newServer() *server {
+func (c *Command) newServer() (*server, error) {
 	router := gin.Default()
 
-	healthcheck.RegisterHandlers(router, c.CommonOpts.Revision)
+	healthcheck.RegisterHandlers(router, c.Revision)
+
+	boltDB, err := store.NewBoltDB(c.BoltDBName, &bolt.Options{Timeout: 1 * time.Second})
+	if err != nil {
+		return nil, err
+	}
+	recordRepo := record.NewBoltRepository(boltDB)
+	recordService := record.NewService(&recordRepo)
+	record.RegisterHandlers(router, recordService)
 
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%d", c.Port),
 		Handler: router,
 	}
 
-	return &server{
-		Command:    c,
-		srv:        srv,
+	s := &server{
+		Command: c,
+		srv:     srv,
+		services: &services{
+			recordService: &recordService,
+		},
+		sharedResources: &sharedResources{
+			boltDB: boltDB,
+		},
 		terminated: make(chan struct{}),
 	}
+	return s, nil
 }
 
 func (s *server) run(ctx context.Context) error {
@@ -74,6 +112,7 @@ func (s *server) run(ctx context.Context) error {
 		// Graceful shutdown
 		<-ctx.Done()
 		s.srv.Shutdown(ctx)
+		s.sharedResources.Close()
 		log.Print("[INFO] server was shut down")
 	}()
 

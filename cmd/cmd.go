@@ -8,11 +8,13 @@ type Interface interface {
 
 // CommonOpts keeps common options, shared across all commands
 type CommonOpts struct {
-	Revision string
+	Revision   string
+	BoltDBName string
 }
 
 // SetCommon sets common option fields
 // The method called by main for each command
 func (c *CommonOpts) SetCommon(commonOpts CommonOpts) {
 	c.Revision = commonOpts.Revision
+	c.BoltDBName = commonOpts.BoltDBName
 }

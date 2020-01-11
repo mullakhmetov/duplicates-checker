@@ -13,19 +13,19 @@ type service struct {
 	repo Repository
 }
 
-func (s service) Create(ctx context.Context) error {
+func (s *service) Create(ctx context.Context) error {
 	return nil
 }
 
-func (s service) IsDouble(ctx context.Context, u1, u2 UserID) (bool, error) {
+func (s *service) IsDouble(ctx context.Context, u1, u2 UserID) (bool, error) {
 	return true, nil
 }
 
-func (s service) Clear(ctx context.Context) error {
+func (s *service) Clear(ctx context.Context) error {
 	return nil
 }
 
 // NewService returns Service implementation
-func NewService(repo Repository) Service {
-	return service{repo}
+func NewService(repo *Repository) Service {
+	return &service{*repo}
 }

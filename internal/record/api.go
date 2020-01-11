@@ -11,7 +11,7 @@ import (
 func RegisterHandlers(r *gin.Engine, service Service) {
 	res := resource{service}
 
-	r.GET("/:u1/:u2", res.isDouble)
+	r.GET("/duples/:u1/:u2", res.isDouble)
 }
 
 type resource struct {
