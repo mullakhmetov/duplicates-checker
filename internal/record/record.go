@@ -6,6 +6,9 @@ import (
 	"net"
 )
 
+// ID specific type
+type ID uint64
+
 // IP specific type
 type IP uint32
 
@@ -14,9 +17,19 @@ type UserID uint64
 
 // Record is the main domain entity represents each log record
 type Record struct {
-	ID     uint64
+	ID     ID
 	UserID UserID
 	IP     IP
+}
+
+// NewRecord creates Record by string IP and UserID
+func NewRecord(s string, id UserID) (*Record, error) {
+	ser := IPSerializer{}
+	ip, err := ser.Encode(s)
+	if err != nil {
+		return nil, err
+	}
+	return &Record{UserID: id, IP: ip}, nil
 }
 
 // IPSerializer serves to IP encoding/decoding

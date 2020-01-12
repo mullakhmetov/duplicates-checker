@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-type testCase struct {
+type recordTestCase struct {
 	i IP
 	s string
 }
@@ -47,8 +47,8 @@ func TestRecordSuccDecode(t *testing.T) {
 	}
 }
 
-func getSuccCases() []testCase {
-	return []testCase{
+func getSuccCases() []recordTestCase {
+	return []recordTestCase{
 		{0, "0.0.0.0"},
 		{16843009, "1.1.1.1"},
 		{4294967295, "255.255.255.255"},

@@ -79,17 +79,6 @@ func TestRest_Signal(t *testing.T) {
 	assert.NoError(t, err, "execute should be without errors")
 }
 
-func chooseRandomUnusedPort() (port int) {
-	for i := 0; i < 10; i++ {
-		port = 40000 + int(rand.Int31n(10000))
-		if ln, err := net.Listen("tcp", fmt.Sprintf(":%d", port)); err == nil {
-			_ = ln.Close()
-			break
-		}
-	}
-	return port
-}
-
 func waitForHTTPServerStart(port int) {
 	// wait for up to 3 seconds for server to start before returning it
 	client := http.Client{Timeout: time.Second}
@@ -104,4 +93,15 @@ func waitForHTTPServerStart(port int) {
 
 func newCommand(port int) *Command {
 	return &Command{Port: port, CommonOpts: cmd.CommonOpts{BoltDBName: "test.db"}}
+}
+
+func chooseRandomUnusedPort() (port int) {
+	for i := 0; i < 10; i++ {
+		port = 40000 + int(rand.Int31n(10000))
+		if ln, err := net.Listen("tcp", fmt.Sprintf(":%d", port)); err == nil {
+			_ = ln.Close()
+			break
+		}
+	}
+	return port
 }

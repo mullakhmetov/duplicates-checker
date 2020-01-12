@@ -15,11 +15,10 @@ import (
 	"github.com/mullakhmetov/duplicates-checker/cmd"
 	"github.com/mullakhmetov/duplicates-checker/internal/healthcheck"
 	"github.com/mullakhmetov/duplicates-checker/internal/record"
-	"github.com/mullakhmetov/duplicates-checker/internal/store"
 )
 
 type services struct {
-	recordService *record.Service
+	recordService record.Service
 }
 
 type sharedResources struct {
@@ -80,12 +79,15 @@ func (c *Command) newServer() (*server, error) {
 
 	healthcheck.RegisterHandlers(router, c.Revision)
 
-	boltDB, err := store.NewBoltDB(c.BoltDBName, &bolt.Options{Timeout: 1 * time.Second})
+	boltDB, err := record.NewBoltDB(c.BoltDBName, &bolt.Options{Timeout: 1 * time.Second})
 	if err != nil {
 		return nil, err
 	}
-	recordRepo := record.NewBoltRepository(boltDB)
-	recordService := record.NewService(&recordRepo)
+	recordRepo, err := record.NewBoltRepository(boltDB)
+	if err != nil {
+		return nil, err
+	}
+	recordService := record.NewService(recordRepo)
 	record.RegisterHandlers(router, recordService)
 
 	srv := &http.Server{
@@ -97,7 +99,7 @@ func (c *Command) newServer() (*server, error) {
 		Command: c,
 		srv:     srv,
 		services: &services{
-			recordService: &recordService,
+			recordService: recordService,
 		},
 		sharedResources: &sharedResources{
 			boltDB: boltDB,
