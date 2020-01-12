@@ -96,6 +96,7 @@ func newCommand(port int) *Command {
 }
 
 func chooseRandomUnusedPort() (port int) {
+	rand.Seed(time.Now().UnixNano())
 	for i := 0; i < 10; i++ {
 		port = 40000 + int(rand.Int31n(10000))
 		if ln, err := net.Listen("tcp", fmt.Sprintf(":%d", port)); err == nil {

@@ -28,9 +28,52 @@ func TestBoltRepo_Create(t *testing.T) {
 
 	record, err := NewRecord("1.1.1.1", 1)
 	assert.NoError(t, err)
-	_, err = r.Create(context.Background(), record)
+	err = r.Create(context.Background(), record)
 
 	assert.NoError(t, err)
+}
+
+func TestBoltRepo_createOrUpdate(t *testing.T) {
+	r, b, teardown := prepRepo(t)
+	defer teardown()
+
+	// create duplicates by IP & UserID keys
+	record, err := NewRecord("1.1.1.1", 1)
+	assert.NoError(t, err)
+	err = r.Create(context.Background(), record)
+	assert.NoError(t, err)
+
+	record, err = NewRecord("1.1.1.1", 1)
+	assert.NoError(t, err)
+	err = r.Create(context.Background(), record)
+	assert.NoError(t, err)
+
+	err = b.View(func(tx *bolt.Tx) error {
+		bkt := tx.Bucket([]byte(bucketName))
+		stats := bkt.Stats()
+		assert.Equal(t, 1, stats.KeyN)
+		return nil
+	})
+	assert.NoError(t, err)
+
+	record, err = NewRecord("2.2.2.2", 1)
+	assert.NoError(t, err)
+	err = r.Create(context.Background(), record)
+	assert.NoError(t, err)
+
+	record, err = NewRecord("1.1.1.1", 2)
+	assert.NoError(t, err)
+	err = r.Create(context.Background(), record)
+	assert.NoError(t, err)
+
+	err = b.View(func(tx *bolt.Tx) error {
+		bkt := tx.Bucket([]byte(bucketName))
+		stats := bkt.Stats()
+		assert.Equal(t, 3, stats.KeyN)
+		return nil
+	})
+	assert.NoError(t, err)
+
 }
 
 func TestBoltRepo_GetUserIPs(t *testing.T) {

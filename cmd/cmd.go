@@ -10,6 +10,7 @@ type Interface interface {
 type CommonOpts struct {
 	Revision   string
 	BoltDBName string
+	Dbg        bool
 }
 
 // SetCommon sets common option fields
@@ -17,4 +18,5 @@ type CommonOpts struct {
 func (c *CommonOpts) SetCommon(commonOpts CommonOpts) {
 	c.Revision = commonOpts.Revision
 	c.BoltDBName = commonOpts.BoltDBName
+	c.Dbg = commonOpts.Dbg
 }

@@ -6,7 +6,7 @@ const doubleLimit = 2
 
 // Service encapsulates usecase logic
 type Service interface {
-	Create(ctx context.Context, id UserID, ip IP) error
+	Create(ctx context.Context, record *Record) error
 	IsDouble(ctx context.Context, u1, u2 UserID) (bool, error)
 	Clear(ctx context.Context) error
 }
@@ -15,9 +15,8 @@ type service struct {
 	repo Repository
 }
 
-func (s *service) Create(ctx context.Context, uID UserID, ip IP) error {
-	record := &Record{UserID: uID, IP: ip}
-	_, err := s.repo.Create(ctx, record)
+func (s *service) Create(ctx context.Context, record *Record) error {
+	err := s.repo.Create(ctx, record)
 	if err != nil {
 		return err
 	}

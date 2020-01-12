@@ -19,6 +19,7 @@ type opts struct {
 	Importer importer.Command `command:"import"`
 
 	BoltDBName string `long:"boltdbname" env:"CHECKER_BOLT_DB_NAME" default:"my.db" description:"boltdb db name"`
+	Dbg        bool   `long:"dbg" env:"DEBUG" description:"debug mode"`
 }
 
 func main() {
@@ -32,6 +33,7 @@ func main() {
 		c.SetCommon(cmd.CommonOpts{
 			Revision:   revision,
 			BoltDBName: opts.BoltDBName,
+			Dbg:        opts.Dbg,
 		})
 		err := c.Execute(args)
 		if err != nil {
@@ -42,6 +44,7 @@ func main() {
 
 	// unknown command
 	if _, err := p.Parse(); err != nil {
+		fmt.Println(err)
 		if flagsErr, ok := err.(*flags.Error); ok && flagsErr.Type == flags.ErrHelp {
 			os.Exit(0)
 		} else {

@@ -14,7 +14,7 @@ const bucketName = "RECORD"
 // Repository encapsulates the logic to access albums from the data source
 type Repository interface {
 	GetUserIPs(ctx context.Context, userID UserID) ([]IP, error)
-	Create(ctx context.Context, record *Record) (ID, error)
+	Create(ctx context.Context, record *Record) error
 	Clean(ctx context.Context) error
 }
 
@@ -51,7 +51,25 @@ func (b *boltRepository) GetUserIPs(ctx context.Context, userID UserID) (ips []I
 	return ips, err
 }
 
-func (b *boltRepository) Create(ctx context.Context, record *Record) (ID, error) {
+func (b *boltRepository) Create(ctx context.Context, record *Record) error {
+	// we don't expose record.id, so in bolt repo implementation in order to reduce memory usage
+	// we do not duplicate records by UserID & IP keys
+	return b.createRecordIfNotExists(ctx, record)
+}
+
+func (b *boltRepository) createRecordIfNotExists(ctx context.Context, record *Record) error {
+	_, ok, err := b.getID(ctx, record)
+	if err != nil {
+		return err
+	}
+	if ok {
+		return nil
+	}
+
+	return b.create(ctx, record)
+}
+
+func (b *boltRepository) create(ctx context.Context, record *Record) error {
 	err := b.DB.Update(func(tx *bolt.Tx) error {
 		bkt := tx.Bucket([]byte(b.BKT))
 		id, _ := bkt.NextSequence()
@@ -64,7 +82,29 @@ func (b *boltRepository) Create(ctx context.Context, record *Record) (ID, error)
 
 		return bkt.Put([]byte(itob(uint64(record.ID))), []byte(buf))
 	})
-	return record.ID, err
+	return err
+}
+
+func (b *boltRepository) getID(ctx context.Context, record *Record) (id ID, ok bool, err error) {
+	err = b.DB.View(func(tx *bolt.Tx) error {
+		var e error
+		bkt := tx.Bucket([]byte(b.BKT))
+
+		bkt.ForEach(func(k, v []byte) error {
+			r := Record{}
+			if e = json.Unmarshal(v, &r); e != nil {
+				return errors.Wrap(e, "failed to unmarshal")
+			}
+			if r.UserID == record.UserID && r.IP == record.IP {
+				id = r.ID
+				ok = true
+				return nil
+			}
+			return nil
+		})
+		return nil
+	})
+	return id, ok, err
 }
 
 func (b *boltRepository) Clean(ctx context.Context) error {

@@ -3,8 +3,12 @@ package record
 import (
 	"encoding/binary"
 	"errors"
+	"math"
 	"net"
 )
+
+// MaxIP is a max possible IP value
+const MaxIP = IP(math.MaxUint32)
 
 // ID specific type
 type ID uint64

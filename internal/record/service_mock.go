@@ -12,8 +12,8 @@ type MockedService struct {
 }
 
 // Create mocked
-func (m *MockedService) Create(ctx context.Context, uID UserID, ip IP) error {
-	args := m.Called(ctx, uID, ip)
+func (m *MockedService) Create(ctx context.Context, record *Record) error {
+	args := m.Called(ctx, record)
 	return args.Error(1)
 }
 

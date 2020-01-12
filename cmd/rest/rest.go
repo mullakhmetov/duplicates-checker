@@ -48,7 +48,7 @@ type Command struct {
 
 // Execute command starts Rest server
 func (c *Command) Execute(args []string) error {
-	log.Printf("[INFO] start server on port %d", c.Port)
+	log.Printf("[INFO] start server on port %d. Debug mode: %t", c.Port, c.Dbg)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	go func() {
