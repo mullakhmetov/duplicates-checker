@@ -17,7 +17,7 @@ import (
 
 var batchSize = int(1e5)
 
-// Command ...
+// Command
 type Command struct {
 	usersCountLimit     int
 	requestPerUserLimit int `long:"port" env:"CHECKER_PORT" default:"8080" description:"port"`
@@ -50,13 +50,12 @@ type importer struct {
 	terminated chan struct{}
 }
 
-// Execute command starts importing data to store
+// Execute command starts importing data to the store
 func (c *Command) Execute(args []string) error {
 	log.Printf("[INFO] start import records process. Debug mode: %t", c.Dbg)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	go func() {
-		// catch signal and invoke graceful termination
 		stop := make(chan os.Signal, 1)
 		signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
 		<-stop

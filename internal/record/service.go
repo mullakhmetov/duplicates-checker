@@ -3,7 +3,6 @@ package record
 import (
 	"context"
 	"encoding/binary"
-	"fmt"
 	"net"
 )
 
@@ -49,7 +48,6 @@ func (s *service) IsDuple(ctx context.Context, u1, u2 UserID) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	fmt.Printf("u1: %v u2: %v\n", u1Info, u2Info)
 	return s.hasNCommons(u1Info.IPs, u2Info.IPs, doubleLimit), nil
 }
 
@@ -57,7 +55,7 @@ func (s *service) Clear(ctx context.Context) error {
 	return s.repo.Clean(ctx)
 }
 
-// Return the value true if `a` and `b` slices has n common values
+// Returns the value true if `a` and `b` slices has n common values
 func (s *service) hasNCommons(a, b []net.IP, n int) bool {
 	temp := make(map[uint32]int)
 

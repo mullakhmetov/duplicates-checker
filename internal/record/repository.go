@@ -12,7 +12,7 @@ import (
 
 const bucketName = "USER_INFO"
 
-// Repository encapsulates the logic to access albums from the data source
+// Repository encapsulates the logic to access domain models
 type Repository interface {
 	GetUserInfo(ctx context.Context, userID UserID) (*UserInfo, error)
 	AddRecord(ctx context.Context, record *Record) error
@@ -157,7 +157,7 @@ func NewBoltRepository(db *bolt.DB) (Repository, error) {
 	return &r, nil
 }
 
-// NewBoltDB return boltb connection
+// NewBoltDB returns boltb connection
 func NewBoltDB(name string, options *bolt.Options) (*bolt.DB, error) {
 	db, err := bolt.Open(name, 0600, options)
 	if err != nil {

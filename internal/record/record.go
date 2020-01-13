@@ -13,7 +13,7 @@ type Record struct {
 	IP     net.IP
 }
 
-// NewRecord creates Record by string IP and UserID
+// NewRecord creates Record by UserID and string IP
 func NewRecord(id UserID, ips string) *Record {
 	ip := net.ParseIP(ips).To4()
 	return &Record{id, ip}

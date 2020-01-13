@@ -25,11 +25,9 @@ func (r resource) IsDuple(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "User id param should be integer"})
 		return
 	}
-
 	res, err := r.service.IsDuple(c, UserID(u1), UserID(u2))
 	if err != nil {
-		// gin.Logger()
-
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal error"})
 	}
 	c.JSON(http.StatusOK, gin.H{"dupes": res})
 }
