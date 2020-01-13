@@ -144,7 +144,6 @@ func (i *importer) run(ctx context.Context) error {
 		}
 	}
 
-	i.sharedResources.Close()
 	close(i.terminated)
 	return nil
 }
