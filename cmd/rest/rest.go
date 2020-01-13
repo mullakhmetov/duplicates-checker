@@ -23,13 +23,11 @@ type services struct {
 
 type sharedResources struct {
 	boltDB *bolt.DB
-	// pgDB   *sqlx.DB
 }
 
 func (s *sharedResources) Close() {
 	log.Print("[INFO] closing shared resources")
 	s.boltDB.Close()
-	// s.pgDB.Close()
 }
 
 type server struct {
@@ -93,15 +91,6 @@ func (c *Command) newServer() (*server, error) {
 		return nil, err
 	}
 
-	// pgDB, err := record.NewPG()
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// recordRepo, err := record.NewPGRepository(pgDB)
-	// if err != nil {
-	// 	return nil, err
-	// }
-
 	recordService := record.NewService(recordRepo)
 	record.RegisterHandlers(router, recordService)
 
@@ -118,7 +107,6 @@ func (c *Command) newServer() (*server, error) {
 		},
 		sharedResources: &sharedResources{
 			boltDB: boltDB,
-			// pgDB:   pgDB,
 		},
 		terminated: make(chan struct{}),
 	}

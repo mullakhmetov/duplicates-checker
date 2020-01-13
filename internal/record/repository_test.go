@@ -69,11 +69,11 @@ func TestBoltRepo_createOrUpdateBehavior(t *testing.T) {
 	defer teardown()
 
 	// create duplicates by IP & UserID keys
-	record := NewRecord(1, ("1.1.1.1"))
+	record := NewRecord(1, "1.1.1.1")
 	err := r.AddRecord(context.Background(), record)
 	assert.NoError(t, err)
 
-	record = NewRecord(1, ("1.1.1.1"))
+	record = NewRecord(1, "1.1.1.1")
 	err = r.AddRecord(context.Background(), record)
 	assert.NoError(t, err)
 
@@ -85,11 +85,11 @@ func TestBoltRepo_createOrUpdateBehavior(t *testing.T) {
 	})
 	assert.NoError(t, err)
 
-	record = NewRecord(1, ("2.2.2.2"))
+	record = NewRecord(1, "2.2.2.2")
 	err = r.AddRecord(context.Background(), record)
 	assert.NoError(t, err)
 
-	record = NewRecord(2, ("1.1.1.1"))
+	record = NewRecord(2, "1.1.1.1")
 	err = r.AddRecord(context.Background(), record)
 	assert.NoError(t, err)
 
@@ -109,8 +109,8 @@ func TestBoltRepo_GetUserInfo(t *testing.T) {
 
 	uID1 := UserID(1)
 	uID2 := UserID(2)
-	ip1 := ("1.1.1.1")
-	ip2 := ("2.2.2.2")
+	ip1 := "1.1.1.1"
+	ip2 := "2.2.2.2"
 	ctx := context.Background()
 
 	rec := NewRecord(uID1, ip1)
@@ -144,7 +144,7 @@ func TestBoltRepo_Clean(t *testing.T) {
 	uID1 := UserID(1)
 
 	ctx := context.Background()
-	rec := NewRecord(uID1, ("1.1.1.1"))
+	rec := NewRecord(uID1, "1.1.1.1")
 	r.AddRecord(ctx, rec)
 	err := r.Clean(ctx)
 	assert.NoError(t, err)
@@ -185,9 +185,9 @@ func TestRecordSuccDecode(t *testing.T) {
 
 func getSuccCases() []recordTestCase {
 	return []recordTestCase{
-		{0, ("0.0.0.0")},
-		{16843009, ("1.1.1.1")},
-		{4294967295, ("255.255.255.255")},
+		{0, "0.0.0.0"},
+		{16843009, "1.1.1.1"},
+		{4294967295, "255.255.255.255"},
 	}
 }
 

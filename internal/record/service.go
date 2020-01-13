@@ -3,6 +3,7 @@ package record
 import (
 	"context"
 	"encoding/binary"
+	"fmt"
 	"net"
 )
 
@@ -48,7 +49,7 @@ func (s *service) IsDuple(ctx context.Context, u1, u2 UserID) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-
+	fmt.Printf("u1: %v u2: %v\n", u1Info, u2Info)
 	return s.hasNCommons(u1Info.IPs, u2Info.IPs, doubleLimit), nil
 }
 
