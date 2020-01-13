@@ -5,7 +5,7 @@ import (
 )
 
 // UserID ...
-type UserID uint64
+type UserID uint32
 
 // Record is the main domain entity represents each log record
 type Record struct {
