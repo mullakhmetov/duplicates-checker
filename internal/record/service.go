@@ -1,13 +1,18 @@
 package record
 
-import "context"
+import (
+	"context"
+	"encoding/binary"
+	"net"
+)
 
 const doubleLimit = 2
 
 // Service encapsulates usecase logic
 type Service interface {
-	Create(ctx context.Context, record *Record) error
-	IsDouble(ctx context.Context, u1, u2 UserID) (bool, error)
+	AddRecord(ctx context.Context, record *Record) error
+	BulkAddRecords(ctx context.Context, records []*Record) error
+	IsDuple(ctx context.Context, u1, u2 UserID) (bool, error)
 	Clear(ctx context.Context) error
 }
 
@@ -15,25 +20,36 @@ type service struct {
 	repo Repository
 }
 
-func (s *service) Create(ctx context.Context, record *Record) error {
-	err := s.repo.Create(ctx, record)
+// AddRecord processes new record
+func (s *service) AddRecord(ctx context.Context, record *Record) error {
+	err := s.repo.AddRecord(ctx, record)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (s *service) IsDouble(ctx context.Context, u1, u2 UserID) (bool, error) {
-	u1IPs, err := s.repo.GetUserIPs(ctx, u1)
+// BulkAddRecords processes new records
+func (s *service) BulkAddRecords(ctx context.Context, records []*Record) error {
+	err := s.repo.BulkAddRecords(ctx, records)
 	if err != nil {
-		return false, nil
+		return err
 	}
-	u2IPs, err := s.repo.GetUserIPs(ctx, u2)
+	return nil
+}
+
+// IsDuple returns true if users are duplicates
+func (s *service) IsDuple(ctx context.Context, u1, u2 UserID) (bool, error) {
+	u1Info, err := s.repo.GetUserInfo(ctx, u1)
 	if err != nil {
-		return false, nil
+		return false, err
+	}
+	u2Info, err := s.repo.GetUserInfo(ctx, u2)
+	if err != nil {
+		return false, err
 	}
 
-	return s.hasNCommons(u1IPs, u2IPs, doubleLimit), nil
+	return s.hasNCommons(u1Info.IPs, u2Info.IPs, doubleLimit), nil
 }
 
 func (s *service) Clear(ctx context.Context) error {
@@ -41,17 +57,18 @@ func (s *service) Clear(ctx context.Context) error {
 }
 
 // Return the value true if `a` and `b` slices has n common values
-func (s *service) hasNCommons(a, b []IP, n int) bool {
-	temp := make(map[IP]int)
+func (s *service) hasNCommons(a, b []net.IP, n int) bool {
+	temp := make(map[uint32]int)
 
 	for _, i := range a {
 		// handle non-unique values
-		temp[i] = 1
+		temp[uint32(binary.BigEndian.Uint32(i.To4()))] = 1
 	}
 	for _, i := range b {
-		v, ok := temp[i]
+		k := uint32(binary.BigEndian.Uint32(i.To4()))
+		v, ok := temp[k]
 		if ok && v < 2 {
-			temp[i]++
+			temp[k]++
 		}
 	}
 

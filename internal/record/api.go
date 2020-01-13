@@ -11,14 +11,14 @@ import (
 func RegisterHandlers(r *gin.Engine, service Service) {
 	res := resource{service}
 
-	r.GET("/duples/:u1/:u2", res.isDouble)
+	r.GET("/duples/:u1/:u2", res.IsDuple)
 }
 
 type resource struct {
 	service Service
 }
 
-func (r resource) isDouble(c *gin.Context) {
+func (r resource) IsDuple(c *gin.Context) {
 	u1, err1 := strconv.Atoi(c.Param("u1"))
 	u2, err2 := strconv.Atoi(c.Param("u2"))
 	if err1 != nil || err2 != nil {
@@ -26,9 +26,10 @@ func (r resource) isDouble(c *gin.Context) {
 		return
 	}
 
-	res, err := r.service.IsDouble(c, UserID(u1), UserID(u2))
+	res, err := r.service.IsDuple(c, UserID(u1), UserID(u2))
 	if err != nil {
-		// TODO
+		// gin.Logger()
+
 	}
 	c.JSON(http.StatusOK, gin.H{"dupes": res})
 }

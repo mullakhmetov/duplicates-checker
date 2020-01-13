@@ -11,14 +11,20 @@ type MockedService struct {
 	mock.Mock
 }
 
-// Create mocked
-func (m *MockedService) Create(ctx context.Context, record *Record) error {
+// AddRecord mocked
+func (m *MockedService) AddRecord(ctx context.Context, record *Record) error {
 	args := m.Called(ctx, record)
 	return args.Error(1)
 }
 
-// IsDouble mocked
-func (m *MockedService) IsDouble(ctx context.Context, u1, u2 UserID) (bool, error) {
+// BulkAddRecords mocked
+func (m *MockedService) BulkAddRecords(ctx context.Context, records []*Record) error {
+	args := m.Called(ctx, records)
+	return args.Error(1)
+}
+
+// IsDuple mocked
+func (m *MockedService) IsDuple(ctx context.Context, u1, u2 UserID) (bool, error) {
 	args := m.Called(ctx, u1, u2)
 	return args.Bool(0), args.Error(1)
 }
@@ -26,11 +32,5 @@ func (m *MockedService) IsDouble(ctx context.Context, u1, u2 UserID) (bool, erro
 // Clear mocked
 func (m *MockedService) Clear(ctx context.Context) error {
 	args := m.Called(ctx)
-	return args.Error(1)
-}
-
-// Close mocked
-func (m *MockedService) Close() error {
-	args := m.Called()
 	return args.Error(1)
 }

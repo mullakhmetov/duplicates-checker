@@ -2,32 +2,41 @@ package record
 
 import (
 	"fmt"
+	"net"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
 type serviceTestCase struct {
-	a   []IP
-	b   []IP
+	a   []net.IP
+	b   []net.IP
 	n   int
 	res bool
 }
 
-func TestService_HasNCommons(t *testing.T) {
-	cases := []serviceTestCase{
-		serviceTestCase{[]IP{}, []IP{}, 1, false},
-		serviceTestCase{[]IP{}, []IP{1}, 1, false},
-		serviceTestCase{[]IP{1}, []IP{1}, 1, true},
-		serviceTestCase{[]IP{1}, []IP{2}, 1, false},
-		serviceTestCase{[]IP{1, 2}, []IP{3, 5}, 1, false},
+var ip1 = net.ParseIP("1.1.1.1")
+var ip2 = net.ParseIP("2.2.2.2")
+var ip3 = net.ParseIP("3.3.3.3")
+var ip4 = net.ParseIP("4.4.4.4")
+var ip5 = net.ParseIP("5.5.5.5")
+var ip6 = net.ParseIP("6.6.6.6")
+var ip7 = net.ParseIP("7.7.7.7")
 
-		serviceTestCase{[]IP{1}, []IP{1}, 2, false},
-		serviceTestCase{[]IP{1}, []IP{2, 3, 4, 5}, 2, false},
-		serviceTestCase{[]IP{1, 2}, []IP{2, 3}, 2, false},
-		serviceTestCase{[]IP{1, 2, 3, 4}, []IP{4, 5, 6, 7}, 2, false},
-		serviceTestCase{[]IP{1, 2, 3, 4}, []IP{3, 4, 5, 6, 7}, 2, true},
-		serviceTestCase{[]IP{1, 2, 3}, []IP{2, 3, 4, 5, 6, 7}, 2, true},
+func TestService_hasNCommons(t *testing.T) {
+	cases := []serviceTestCase{
+		serviceTestCase{[]net.IP{}, []net.IP{}, 1, false},
+		serviceTestCase{[]net.IP{}, []net.IP{ip1}, 1, false},
+		serviceTestCase{[]net.IP{ip1}, []net.IP{ip1}, 1, true},
+		serviceTestCase{[]net.IP{ip1}, []net.IP{ip2}, 1, false},
+		serviceTestCase{[]net.IP{ip1, ip2}, []net.IP{ip3, ip5}, 1, false},
+
+		serviceTestCase{[]net.IP{ip1}, []net.IP{ip1}, 2, false},
+		serviceTestCase{[]net.IP{ip1}, []net.IP{ip2, ip3, ip4, ip5}, 2, false},
+		serviceTestCase{[]net.IP{ip1, ip2}, []net.IP{ip2, ip3}, 2, false},
+		serviceTestCase{[]net.IP{ip1, ip2, ip3, ip4}, []net.IP{ip4, ip5, ip6, ip7}, 2, false},
+		serviceTestCase{[]net.IP{ip1, ip2, ip3, ip4}, []net.IP{ip3, ip4, ip5, ip6, ip7}, 2, true},
+		serviceTestCase{[]net.IP{ip1, ip2, ip3}, []net.IP{ip2, ip3, ip4, ip5, ip6, ip7}, 2, true},
 	}
 	s := &service{}
 	for _, c := range cases {

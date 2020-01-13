@@ -10,10 +10,10 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-func TestSuccIsDoubleTrue(t *testing.T) {
+func TestSuccIsDupleTrue(t *testing.T) {
 	router, ms := setupRouter()
 
-	ms.On("IsDouble", mock.AnythingOfType("*gin.Context"), UserID(1), UserID(1)).Return(true, nil)
+	ms.On("IsDuple", mock.AnythingOfType("*gin.Context"), UserID(1), UserID(1)).Return(true, nil)
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/duples/1/1", nil)
 	router.ServeHTTP(w, req)
@@ -21,10 +21,10 @@ func TestSuccIsDoubleTrue(t *testing.T) {
 	ms.AssertExpectations(t)
 }
 
-func TestSuccIsDoubleFalse(t *testing.T) {
+func TestSuccIsDupleFalse(t *testing.T) {
 	router, ms := setupRouter()
 
-	ms.On("IsDouble", mock.AnythingOfType("*gin.Context"), UserID(1), UserID(2)).Return(false, nil)
+	ms.On("IsDuple", mock.AnythingOfType("*gin.Context"), UserID(1), UserID(2)).Return(false, nil)
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/duples/1/2", nil)
 	router.ServeHTTP(w, req)
@@ -32,7 +32,7 @@ func TestSuccIsDoubleFalse(t *testing.T) {
 	ms.AssertExpectations(t)
 }
 
-func TestFailIsDouble(t *testing.T) {
+func TestFailIsDuple(t *testing.T) {
 	router, _ := setupRouter()
 
 	w := httptest.NewRecorder()
