@@ -15,8 +15,8 @@ import (
 var revision = "unknown"
 
 type opts struct {
-	Rest     rest.Command     `command:"server"`
-	Importer importer.Command `command:"import"`
+	Rest     rest.Command     `command:"server" description:"Starts REST server"`
+	Importer importer.Command `command:"import" description:"Starts randomly generated dataset loading. See import command help for details"`
 
 	BoltDBName string `long:"boltdbname" env:"CHECKER_BOLT_DB_NAME" default:"my.db" description:"boltdb db name"`
 	Dbg        bool   `long:"dbg" env:"DEBUG" description:"debug mode"`
@@ -44,7 +44,6 @@ func main() {
 
 	// unknown command
 	if _, err := p.Parse(); err != nil {
-		fmt.Println(err)
 		if flagsErr, ok := err.(*flags.Error); ok && flagsErr.Type == flags.ErrHelp {
 			os.Exit(0)
 		} else {

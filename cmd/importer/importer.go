@@ -17,11 +17,12 @@ import (
 
 var batchSize = int(1e5)
 
-// Command
+// Command for randomly generated dataset loading
 type Command struct {
-	usersCountLimit     int
-	requestPerUserLimit int `long:"port" env:"CHECKER_PORT" default:"8080" description:"port"`
-	ipsPerUserLimit     int
+	UsersCount          uint `long:"users_count" env:"CHECKER_GEN_USERS_COUNT" default:"10000" description:"unique users count"`
+	RequestPerUserLimit uint `long:"requests_limit" env:"CHECKER_GEN_REQUESTS_LIMIT" default:"1000000" description:"max requests per user"`
+	RequestPerUserMean  uint `long:"requests_mean" env:"CHECKER_GEN_REQUESTS_MEAN" default:"10000" description:"requests per user distribution mean"`
+	IPsPerUserLimit     uint `long:"ips_limit" env:"CHECKER_GEN_IPS_LIMIT" default:"10" description:"unique ips per user limit. exponentially distributed"`
 
 	cmd.CommonOpts
 }
@@ -116,7 +117,13 @@ func (i *importer) run(ctx context.Context) error {
 	if i.dbg {
 		ch = i.gen.generateDbg(ctx)
 	} else {
-		ch = i.gen.generate(ctx)
+		ch = i.gen.generate(
+			ctx,
+			i.Command.UsersCount,
+			i.Command.RequestPerUserLimit,
+			i.Command.RequestPerUserMean,
+			i.Command.IPsPerUserLimit,
+		)
 	}
 
 	records := make([]*record.Record, 0, batchSize)

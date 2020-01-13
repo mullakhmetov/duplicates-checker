@@ -33,6 +33,7 @@ func (g *generator) generateDbg(ctx context.Context) chan *record.Record {
 	ch := make(chan *record.Record)
 	go func() {
 		defer close(ch)
+
 		for _, log := range logs {
 			select {
 			case ch <- record.NewRecord(record.UserID(log.uID), log.IP):
@@ -45,7 +46,7 @@ func (g *generator) generateDbg(ctx context.Context) chan *record.Record {
 	return ch
 }
 
-func (g *generator) generate(ctx context.Context) chan *record.Record {
+func (g *generator) generate(ctx context.Context, usersCount, requestsLimit, requestsMean, ipsLimit uint) chan *record.Record {
 	getIP := ipsGetter()
 
 	var i, ipsCount, reqCount uint
@@ -53,13 +54,15 @@ func (g *generator) generate(ctx context.Context) chan *record.Record {
 
 	ch := make(chan *record.Record)
 	go func() {
-		for uID := record.UserID(1); uID < 1*1e3; uID++ {
-			ipsCount = g.getUserIPSCount(10)
+		defer close(ch)
+
+		for uID := record.UserID(1); uID < record.UserID(usersCount); uID++ {
+			ipsCount = g.getUserIPSCount(ipsLimit)
 			ips = make([]string, 0, ipsCount)
 			for i = uint(0); i <= ipsCount; i++ {
 				ips = append(ips, getIP())
 			}
-			reqCount = g.getUserRequestsCount(1*1e4, 1*1e6)
+			reqCount = g.getUserRequestsCount(requestsMean, requestsLimit)
 
 			for i = uint(1); i <= reqCount; i++ {
 				select {
@@ -87,9 +90,9 @@ func (g *generator) getUserIPSCount(max uint) uint {
 
 // Returns normally distributed value from 1 to int(MaxFloat64) with `max` limit
 // Represents how many requests user did
-func (g *generator) getUserRequestsCount(mean float64, max uint) (res uint) {
+func (g *generator) getUserRequestsCount(mean, max uint) (res uint) {
 	desiredStdDev := 1.0
-	res = uint(g.random.NormFloat64()*desiredStdDev + mean)
+	res = uint(g.random.NormFloat64()*desiredStdDev + float64(mean))
 	if res > max {
 		res = max
 	}
