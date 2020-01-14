@@ -40,6 +40,9 @@ func (s *service) BulkAddRecords(ctx context.Context, records []*Record) error {
 
 // IsDuple returns true if users are duplicates
 func (s *service) IsDuple(ctx context.Context, u1, u2 UserID) (bool, error) {
+	if u1 == u2 {
+		return true, nil
+	}
 	u1Info, err := s.repo.GetUserInfo(ctx, u1)
 	if err != nil {
 		return false, err
@@ -48,6 +51,7 @@ func (s *service) IsDuple(ctx context.Context, u1, u2 UserID) (bool, error) {
 	if err != nil {
 		return false, err
 	}
+
 	return s.hasNCommons(u1Info.IPs, u2Info.IPs, doubleLimit), nil
 }
 
