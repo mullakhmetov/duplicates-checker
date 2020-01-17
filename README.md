@@ -1,33 +1,13 @@
 # duplicates-checker
 
-## Usage
+* [Specification](#spec)
+* [Usage](#usage)
+  * [Generate and load dataset](#usage-generate)
+  * [Start REST](#usage-rest)
 
-### build
-```bash
-make
-```
 
-### help
-```
-./duplicates-checker --help
-```
-
-### generate and load dataset
-#### help
-`./duplicates-checker import --help`
-#### generate dataset for debug
-`./duplicates-checker import --dbg`
-
-### start REST
-#### help
-`./duplicates-checker server --help`
-#### run in debug mod on 8080 port
-`./duplicates-checker server --port=8080 --dbg`
-
-### make request
-`curl http://localhost:8080/1/2/`
-
-## Spec
+<a name="spec"></a>
+## Specification
 
 Implement REST service.
 
@@ -118,3 +98,36 @@ Response:
 ```json
 { "dupes": true}
 ```
+
+<a name="usage"></a>
+## Usage
+
+#### build
+```bash
+make
+```
+
+#### help
+```
+./duplicates-checker --help
+```
+
+<a name="usage-generate"></a>
+### generate and load dataset
+
+#### help
+`./duplicates-checker import --help`
+#### generate dataset for debug
+`./duplicates-checker import --dbg`
+
+
+<a name="usage-rest"></a>
+### start REST
+
+#### help
+`./duplicates-checker server --help`
+#### run in debug mod on 8080 port
+`./duplicates-checker server --port=8080 --dbg`
+
+### make request
+`curl http://localhost:8080/1/2/`
